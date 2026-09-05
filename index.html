@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Agachamento - Teste</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #FAF7F1;
+    --teal: #1F5C56;
+    --teal-dark: #163F3B;
+    --coral: #E8794F;
+    --ink: #23302C;
+    --success: #3C8562;
+    --line: #DCD5C7;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--cream);
+    color: var(--ink);
+    font-family: 'Atkinson Hyperlegible', system-ui, sans-serif;
+    -webkit-tap-highlight-color: transparent;
+    overscroll-behavior: none;
+  }
+
+  body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .screen {
+    display: none;
+    flex: 1;
+    flex-direction: column;
+    padding: 28px 24px 40px;
+    min-height: 100vh;
+  }
+  .screen.active { display: flex; }
+
+  header.top {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+  }
+
+  .back-btn {
+    background: none;
+    border: 2px solid var(--line);
+    border-radius: 14px;
+    width: 48px;
+    height: 48px;
+    font-size: 22px;
+    color: var(--teal-dark);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  h1 {
+    font-size: 28px;
+    margin: 0 0 4px;
+    color: var(--teal-dark);
+  }
+
+  p.subtitle {
+    font-size: 18px;
+    color: #5B6B63;
+    margin: 0 0 24px;
+    line-height: 1.4;
+  }
+
+  /* Lista de exercicios */
+  .exercise-card {
+    background: white;
+    border: 2px solid var(--line);
+    border-radius: 20px;
+    padding: 22px;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    margin-bottom: 16px;
+  }
+
+  .exercise-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+    background: var(--teal);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+  }
+
+  .exercise-card h2 {
+    font-size: 22px;
+    margin: 0 0 2px;
+    color: var(--ink);
+  }
+
+  .exercise-card span {
+    font-size: 15px;
+    color: #7A8981;
+  }
+
+  .exercise-card.disabled {
+    opacity: 0.5;
+  }
+
+  /* Detalhe do exercicio */
+  .demo-box {
+    background: var(--teal-dark);
+    border-radius: 22px;
+    aspect-ratio: 4/3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 24px;
+    overflow: hidden;
+  }
+
+  .squat-figure {
+    width: 100px;
+    height: 140px;
+  }
+
+  .instructions {
+    background: white;
+    border: 2px solid var(--line);
+    border-radius: 18px;
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+  .instructions h3 {
+    margin: 0 0 10px;
+    font-size: 19px;
+    color: var(--teal-dark);
+  }
+  .instructions ol {
+    margin: 0;
+    padding-left: 22px;
+    font-size: 17px;
+    line-height: 1.6;
+  }
+
+  .primary-btn {
+    background: var(--teal);
+    color: white;
+    border: none;
+    border-radius: 18px;
+    padding: 20px;
+    font-size: 22px;
+    font-weight: 700;
+    font-family: inherit;
+    margin-top: auto;
+  }
+  .primary-btn:active { background: var(--teal-dark); }
+
+  .secondary-btn {
+    background: white;
+    color: var(--teal-dark);
+    border: 2px solid var(--teal);
+    border-radius: 18px;
+    padding: 18px;
+    font-size: 19px;
+    font-weight: 700;
+    font-family: inherit;
+  }
+
+  /* Tela de execucao */
+  .exec-screen {
+    align-items: center;
+    justify-content: space-between;
+    text-align: center;
+  }
+
+  .status-pill {
+    display: inline-block;
+    padding: 8px 18px;
+    border-radius: 999px;
+    background: var(--line);
+    font-size: 15px;
+    color: #5B6B63;
+    margin-bottom: 20px;
+  }
+  .status-pill.live {
+    background: #DCEFE4;
+    color: var(--success);
+  }
+
+  .counter-wrap {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .counter-number {
+    font-size: 140px;
+    font-weight: 700;
+    color: var(--teal-dark);
+    line-height: 1;
+  }
+
+  .counter-label {
+    font-size: 20px;
+    color: #5B6B63;
+    margin-top: 8px;
+  }
+
+  .sensitivity-row {
+    width: 100%;
+    margin: 20px 0;
+  }
+  .sensitivity-row label {
+    display: block;
+    font-size: 16px;
+    color: #5B6B63;
+    margin-bottom: 8px;
+  }
+  .sensitivity-row input[type=range] {
+    width: 100%;
+    accent-color: var(--teal);
+  }
+
+  .exec-buttons {
+    width: 100%;
+    display: flex;
+    gap: 12px;
+  }
+  .exec-buttons button { flex: 1; }
+
+  .debug-box {
+    width: 100%;
+    background: white;
+    border: 2px dashed var(--line);
+    border-radius: 14px;
+    padding: 12px;
+    font-size: 13px;
+    color: #7A8981;
+    margin-top: 16px;
+    font-family: monospace;
+    text-align: left;
+    max-height: 90px;
+    overflow-y: auto;
+  }
+
+  /* Resumo */
+  .summary-number {
+    font-size: 90px;
+    font-weight: 700;
+    color: var(--success);
+    text-align: center;
+    line-height: 1;
+    margin: 40px 0 4px;
+  }
+  .summary-label {
+    text-align: center;
+    font-size: 20px;
+    color: #5B6B63;
+    margin-bottom: 40px;
+  }
+
+  .permission-note {
+    background: #FDF1E7;
+    border: 2px solid #F0CBA8;
+    border-radius: 16px;
+    padding: 16px 18px;
+    font-size: 15px;
+    color: #7A4A26;
+    margin-top: 16px;
+    line-height: 1.5;
+  }
+</style>
+</head>
+<body>
+
+  <!-- TELA 1: lista de exercicios -->
+  <div class="screen active" id="screen-list">
+    <header class="top">
+      <div></div>
+    </header>
+    <h1>Seus exercícios</h1>
+    <p class="subtitle">Escolha um exercício para começar.</p>
+
+    <div class="exercise-card" onclick="goTo('screen-detail')">
+      <div class="exercise-icon">🏋️</div>
+      <div>
+        <h2>Agachamento</h2>
+        <span>Equilíbrio e força nas pernas</span>
+      </div>
+    </div>
+
+    <div class="exercise-card disabled">
+      <div class="exercise-icon">🙆</div>
+      <div>
+        <h2>Elevação de braço</h2>
+        <span>Em breve</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- TELA 2: detalhe / video do exercicio -->
+  <div class="screen" id="screen-detail">
+    <header class="top">
+      <button class="back-btn" onclick="goTo('screen-list')">←</button>
+    </header>
+    <h1>Agachamento</h1>
+    <p class="subtitle">Veja como fazer antes de começar.</p>
+
+    <div class="demo-box">
+      <svg class="squat-figure" viewBox="0 0 100 140" id="demo-svg">
+        <circle cx="50" cy="20" r="14" fill="#F4EFE4"/>
+        <line x1="50" y1="34" x2="50" y2="75" stroke="#F4EFE4" stroke-width="8" stroke-linecap="round"/>
+        <line x1="50" y1="45" x2="25" y2="60" stroke="#F4EFE4" stroke-width="7" stroke-linecap="round"/>
+        <line x1="50" y1="45" x2="75" y2="60" stroke="#F4EFE4" stroke-width="7" stroke-linecap="round"/>
+        <line x1="50" y1="75" x2="35" y2="115" stroke="#F4EFE4" stroke-width="8" stroke-linecap="round"/>
+        <line x1="50" y1="75" x2="65" y2="115" stroke="#F4EFE4" stroke-width="8" stroke-linecap="round"/>
+      </svg>
+    </div>
+
+    <div class="instructions">
+      <h3>Como executar</h3>
+      <ol>
+        <li>Segure o celular com as duas mãos, junto ao peito.</li>
+        <li>Fique em pé, com os pés na largura do quadril.</li>
+        <li>Dobre os joelhos, descendo devagar, e volte a subir.</li>
+        <li>Repita no seu ritmo — o app conta sozinho.</li>
+      </ol>
+    </div>
+
+    <button class="primary-btn" onclick="goToExec()">Começar (Start)</button>
+  </div>
+
+  <!-- TELA 3: execucao com contagem -->
+  <div class="screen exec-screen" id="screen-exec">
+    <header class="top" style="width:100%">
+      <button class="back-btn" onclick="stopAndGo('screen-detail')">←</button>
+      <div id="statusPill" class="status-pill">Parado</div>
+    </header>
+
+    <div class="counter-wrap">
+      <div class="counter-number" id="counterNumber">0</div>
+      <div class="counter-label">agachamentos</div>
+    </div>
+
+    <div class="sensitivity-row">
+      <label>Sensibilidade do sensor: <span id="sensVal">1.2</span></label>
+      <input type="range" id="sensSlider" min="0.6" max="2.4" step="0.1" value="1.2">
+    </div>
+
+    <div class="exec-buttons">
+      <button class="secondary-btn" onclick="resetCounter()">Zerar</button>
+      <button class="primary-btn" id="toggleBtn" onclick="toggleTracking()">Iniciar sensor</button>
+    </div>
+
+    <div class="debug-box" id="debugBox">aguardando dados do acelerômetro…</div>
+  </div>
+
+  <!-- TELA 4: resumo -->
+  <div class="screen" id="screen-summary">
+    <header class="top">
+      <button class="back-btn" onclick="goTo('screen-list')">←</button>
+    </header>
+    <h1>Muito bem!</h1>
+    <p class="subtitle">Você concluiu o exercício de agachamento.</p>
+
+    <div class="summary-number" id="summaryNumber">0</div>
+    <div class="summary-label">agachamentos realizados</div>
+
+    <button class="primary-btn" onclick="goTo('screen-list')">Voltar aos exercícios</button>
+  </div>
+
+<script>
+  // ---------- Navegação entre telas ----------
+  function goTo(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  }
+
+  function goToExec() {
+    resetCounter();
+    goTo('screen-exec');
+  }
+
+  function stopAndGo(id) {
+    stopTracking();
+    goTo(id);
+  }
+
+  // ---------- Lógica do acelerômetro ----------
+  let tracking = false;
+  let repCount = 0;
+  let sensitivity = 1.2;
+
+  // Máquina de estados simples: detecta descida -> subida como 1 repetição
+  let phase = 'up'; // 'up' | 'down'
+  let smoothed = 0;
+  const alpha = 0.2; // suavização do sinal
+
+  const sensSlider = document.getElementById('sensSlider');
+  const sensVal = document.getElementById('sensVal');
+  sensSlider.addEventListener('input', () => {
+    sensitivity = parseFloat(sensSlider.value);
+    sensVal.textContent = sensitivity.toFixed(1);
+  });
+
+  function resetCounter() {
+    repCount = 0;
+    phase = 'up';
+    smoothed = 0;
+    document.getElementById('counterNumber').textContent = '0';
+  }
+
+  function updateDebug(msg) {
+    document.getElementById('debugBox').textContent = msg;
+  }
+
+  function speak(number) {
+    if (!('speechSynthesis' in window)) return;
+    const utter = new SpeechSynthesisUtterance(String(number));
+    utter.lang = 'pt-BR';
+    utter.rate = 1.1;
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.speak(utter);
+  }
+
+  function handleMotion(event) {
+    const acc = event.accelerationIncludingGravity || event.acceleration;
+    if (!acc) return;
+
+    // Usamos o eixo Y (vertical quando o celular é segurado junto ao peito)
+    const raw = acc.y || 0;
+
+    // suavização exponencial pra reduzir ruído
+    smoothed = alpha * raw + (1 - alpha) * smoothed;
+
+    updateDebug(`eixo Y bruto: ${raw.toFixed(2)}  |  suavizado: ${smoothed.toFixed(2)}  |  fase: ${phase}`);
+
+    const threshold = sensitivity;
+
+    if (phase === 'up' && smoothed < -threshold) {
+      phase = 'down';
+    } else if (phase === 'down' && smoothed > threshold) {
+      phase = 'up';
+      repCount++;
+      document.getElementById('counterNumber').textContent = repCount;
+      speak(repCount);
+    }
+  }
+
+  async function toggleTracking() {
+    if (tracking) {
+      stopTracking();
+      return;
+    }
+
+    // iOS exige permissão explícita do usuário
+    if (typeof DeviceMotionEvent !== 'undefined' &&
+        typeof DeviceMotionEvent.requestPermission === 'function') {
+      try {
+        const result = await DeviceMotionEvent.requestPermission();
+        if (result !== 'granted') {
+          updateDebug('Permissão negada. Ative o acesso ao movimento nas configurações do navegador.');
+          return;
+        }
+      } catch (err) {
+        updateDebug('Erro ao pedir permissão: ' + err.message);
+        return;
+      }
+    }
+
+    window.addEventListener('devicemotion', handleMotion);
+    tracking = true;
+    document.getElementById('statusPill').textContent = 'Ativo — pode começar';
+    document.getElementById('statusPill').classList.add('live');
+    document.getElementById('toggleBtn').textContent = 'Parar sensor';
+  }
+
+  function stopTracking() {
+    window.removeEventListener('devicemotion', handleMotion);
+    tracking = false;
+    document.getElementById('statusPill').textContent = 'Parado';
+    document.getElementById('statusPill').classList.remove('live');
+    document.getElementById('toggleBtn').textContent = 'Iniciar sensor';
+
+    if (repCount > 0) {
+      document.getElementById('summaryNumber').textContent = repCount;
+    }
+  }
+</script>
+</body>
+</html>
